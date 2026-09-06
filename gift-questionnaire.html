@@ -1,0 +1,707 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Gift Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --paper: #FBF3F0;
+    --paper-card: #FFFFFF;
+    --ink: #2B1B24;
+    --ink-soft: #6E5A62;
+    --line: #EAD9D3;
+    --rose: #B4657A;
+    --rose-deep: #8E4A5C;
+    --gold: #C08B3E;
+    --done: #7C8F6E;
+  }
+
+  *{ box-sizing: border-box; }
+
+  html,body{
+    margin:0;
+    padding:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+  }
+
+  .page{
+    max-width:700px;
+    margin:0 auto;
+    padding:56px 24px 120px;
+  }
+
+  header.hero{
+    margin-bottom:36px;
+  }
+
+  .kicker{
+    font-family:'Fraunces',serif;
+    font-style:italic;
+    font-size:16px;
+    color:var(--rose-deep);
+    margin:0 0 6px;
+  }
+
+  h1{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:clamp(32px,6vw,44px);
+    line-height:1.1;
+    margin:0 0 14px;
+    letter-spacing:-0.01em;
+  }
+
+  .lede{
+    font-size:15.5px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:52ch;
+    margin:0;
+  }
+
+  .controls{
+    position:sticky;
+    top:0;
+    z-index:5;
+    background:var(--paper);
+    padding:18px 0 16px;
+    margin-top:24px;
+    border-bottom:1px solid var(--line);
+  }
+
+  .search-row{
+    display:flex;
+    gap:10px;
+    align-items:center;
+  }
+
+  #search{
+    flex:1;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:11px 16px;
+    border-radius:9px;
+    border:1px solid var(--line);
+    background:var(--paper-card);
+    color:var(--ink);
+    outline:none;
+  }
+  #search::placeholder{ color:#B9A6AC; }
+  #search:focus{ border-color:var(--rose); }
+
+  .progress-wrap{
+    margin-top:12px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
+  .progress-track{
+    flex:1;
+    height:6px;
+    border-radius:4px;
+    background:var(--line);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--gold);
+    width:0%;
+    transition:width .3s ease;
+  }
+  .progress-label{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .sections{
+    margin-top:8px;
+  }
+
+  details.section{
+    border-bottom:1px solid var(--line);
+    padding:20px 0;
+  }
+  details.section[open] summary .chev{ transform:rotate(90deg); }
+
+  summary.sec-head{
+    list-style:none;
+    cursor:pointer;
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+  }
+  summary.sec-head::-webkit-details-marker{ display:none; }
+
+  .sec-title{
+    font-family:'Fraunces',serif;
+    font-weight:600;
+    font-size:19px;
+    display:flex;
+    align-items:center;
+    gap:9px;
+  }
+  .chev{
+    display:inline-block;
+    color:var(--rose);
+    transition:transform .18s ease;
+    font-size:13px;
+  }
+  .sec-count{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .items{
+    margin-top:16px;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+  }
+
+  .item{
+    display:grid;
+    grid-template-columns:22px 1fr;
+    gap:10px 12px;
+    padding:10px 6px;
+    border-radius:8px;
+  }
+  .item:hover{ background:rgba(180,101,122,0.06); }
+
+  .item input[type=checkbox]{
+    appearance:none;
+    width:19px;
+    height:19px;
+    margin-top:2px;
+    border:1.5px solid #D9C3C9;
+    border-radius:5px;
+    cursor:pointer;
+    position:relative;
+    background:var(--paper-card);
+    flex-shrink:0;
+  }
+  .item input[type=checkbox]:checked{
+    background:var(--done);
+    border-color:var(--done);
+  }
+  .item input[type=checkbox]:checked::after{
+    content:'';
+    position:absolute;
+    left:6px; top:2px;
+    width:5px; height:9px;
+    border:solid white;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+
+  .item-body{ min-width:0; }
+
+  .q-text{
+    font-size:14.5px;
+    line-height:1.5;
+    margin:0 0 6px;
+  }
+  .item.answered .q-text{ color:var(--ink-soft); }
+
+  .a-input{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    padding:8px 10px;
+    border-radius:7px;
+    border:1px solid var(--line);
+    background:var(--paper-card);
+    color:var(--ink);
+    outline:none;
+  }
+  .a-input::placeholder{ color:#C7B4BA; }
+  .a-input:focus{ border-color:var(--rose); }
+
+  .hidden{ display:none !important; }
+
+  .empty-state{
+    padding:40px 0;
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14.5px;
+  }
+
+  footer.foot{
+    margin-top:40px;
+    padding-top:20px;
+    border-top:1px solid var(--line);
+    font-size:12.5px;
+    color:var(--ink-soft);
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+  .foot button{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    color:var(--rose-deep);
+    background:none;
+    border:none;
+    cursor:pointer;
+    padding:0;
+    text-decoration:underline;
+    text-underline-offset:2px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <p class="kicker">for someone I love</p>
+    <h1>Gift Notes</h1>
+    <p class="lede">A running list of everything worth remembering — answered a little at a time, whenever it comes up in conversation.</p>
+  </header>
+
+  <div class="controls">
+    <div class="search-row">
+      <input id="search" type="text" placeholder="Search every question…" autocomplete="off" />
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 0 answered</div>
+    </div>
+  </div>
+
+  <div class="sections" id="sections"></div>
+  <div class="empty-state hidden" id="emptyState">Nothing matches that search.</div>
+
+  <footer class="foot">
+    <span>Answers save automatically to this page.</span>
+    <button id="clearAll">Clear all answers</button>
+  </footer>
+
+</div>
+
+<script>
+const DATA = [
+["Important + Random", [
+"Height","Weight","Birthday + Zodiac + Birthstone","Dog or cat person?","Canines or felines?",
+"Allergies (food, seasonal, materials like latex/wool)","Favorite color","Least favorite color","Dream car",
+"Favorite animals","Favorite people","Favorite themes","Favorite memory","Favorite quote",
+"Favorite non-profit to support","Favorite celebrity","Favorite superhero","Favorite body part of yours",
+"Favorite number","Favorite word or phrase they say a lot","Left or right handed?",
+"Any nicknames you actually like?","Do you know/care about your moon or rising sign?","Lucky charm or object",
+"Something you collect (even informally)"
+]],
+["Hobbies & Relaxing", [
+"Favorite hobbies","Any hobbies/activities you've been really into lately?","How do you like to relax?",
+"Something you've been wanting to try but haven't yet?","Outdoor or indoor activities?",
+"Indoor or outdoor person?","What do you do when you're bored?","Favorite time of year","Favorite season",
+"Favorite form of entertainment","Favorite type of media (music, movies, an online course, etc.)",
+"Favorite holiday","Do you think gardening is fun?","Do you subscribe to any magazines?",
+"Do you like polaroid cameras?","Ideal date plan","What physical thing do you wanna learn how to do?",
+"Are you creative?","A hobby you used to love but stopped — want to get back into it?",
+"Do you like DIY/craft kits (candles, pottery, embroidery, etc.)?",
+"Would you want lessons/classes as a gift (cooking, dance, painting, an instrument)?",
+"Do you like subscription boxes? What kind?","Are you into photography? Film or digital?",
+"Do you like journaling? Guided or blank?"
+]],
+["Calm & Cozy", [
+"Ideal way to unwind after a long day","Candles, blankets, essential oils, or something else?",
+"What makes a cozy atmosphere for entertaining at home?","Any specific item that eases stress?",
+"Sleeping in or staying up late?","Guilty pleasure","Do you like weighted blankets?",
+"Heating pad or ice pack person?","Do you like ambient/white noise machines?",
+"Favorite drink to have while relaxing"
+]],
+["Games", [
+"Favorite physical game","Favorite board game","Favorite card game","Favorite video game",
+"Do you spend money on games or in-game items?","Favorite toy",
+"Do you like puzzles? What kind (jigsaw, 3D, etc.)?",
+"What would you enjoy most at a place like Main Event (bowling, laser tag, arcade)?",
+"What gaming platform(s) do you own?","Any games on your wishlist right now?",
+"Do you like tabletop/RPG games (D&D, etc.)?","Solo games or multiplayer/party games?"
+]],
+["Digital Entertainment", [
+"Favorite app","Favorite YouTuber","Favorite content creator","Favorite social media",
+"Any podcasts you love?","Do you like streaming/Twitch? Anyone specific?",
+"Would you want merch from a creator/streamer you follow?"
+]],
+["Sports", [
+"Favorite sport","Favorite sports team","Favorite athlete","Favorite sport to watch",
+"Any exercise equipment you want?","Do you like going to sports games in person?",
+"Do you care who wins the Super Bowl/World Cup/March Madness/US Open/Kentucky Derby?",
+"What sports equipment do you have?","Last sporting event you attended in person",
+"Have you ever face-painted for a team?","Do you play any sports yourself, casually or competitively?",
+"Favorite jersey/player number if any","Would you wear team apparel as everyday clothing?"
+]],
+["Music", [
+"Favorite artist","Favorite band","Do you own anything music/artist-related?",
+"If you could play any instrument, what would it be?","Do you like singing?",
+"Would you want to own something music/artist-related?","Vinyl, CDs, or fully digital?",
+"Do you already have a record player / speaker setup?",
+"Concerts — do you like going? Anyone you'd want to see live?","Favorite genre(s)","Favorite album of all time"
+]],
+["Movies + TV", [
+"Favorite TV show","Favorite movie","Favorite movie theater","Fiction or non-fiction?",
+"Do you like history movies?","A movie that brought happy tears?","Do you cry at movies?",
+"Ever been to a movie premiere?","Do you enjoy live theater?","Musical theater or classical concert?",
+"Would you want to go to a movie premiere?","Theater or streaming at home?","Do you like reality TV?",
+"Favorite TV genres","Favorite streaming service(s)","Blu-rays/physical media, or all digital?",
+"Favorite director","Comfort show you rewatch"
+]],
+["Books", [
+"Favorite book","Favorite author","If you could publish a book, what type?","Books or movies?",
+"Would you like to try reading more?","What genres (fiction, non-fiction, fantasy, self-help, etc.)?",
+"Physical shelf books or library borrows?","Audiobooks, e-reader, or paperback?",
+"Do you own an e-reader?","Do you like annotating/highlighting books, or keep them pristine?",
+"Book you've reread the most","Anything on your to-be-read list right now?"
+]],
+["Shopping", [
+"Finish the sentence: \"A day of shopping sounds…\"",
+"What types of items are you drawn to when shopping?","Favorite place to shop","Favorite store",
+"Do you like thrift/vintage shopping or prefer new/retail?",
+"Do you shop small/local business when possible?","Online or in-person shopping preference?"
+]],
+["Self-Care", [
+"Favorite scent for personal care items","Bar soap or body wash?","Favorite self-care products",
+"Do you get manicures/pedicures? Would you want a gift card for one?",
+"Do you like face masks/skincare routines? Any brands you love?","Do you like massages?",
+"Electric toothbrush/water flosser type gadgets — into that stuff?"
+]],
+["Traveling", [
+"Would you backpack around a country?","Favorite travel destination",
+"Where do you hope to visit next few years?","Favorite travel accessory","Do you enjoy travel planning?",
+"Carry-on only or max luggage?","Inflatable pillow or eye mask on planes?","Do you really enjoy camping?",
+"Where do you want to travel most?","Favorite vacation","Underpacker or overpacker?",
+"Theme park or nature park?","Disneyland or Legoland?","Mountains or beach?",
+"Do you enjoy eating local foods when traveling?",
+"Road trip to national parks or fly to an exotic island?","Favorite travel planning resource",
+"Planned-out or free-flowing vacations?","Most fun part of traveling",
+"Do you have a passport / want international travel?","Do you like travel journals/scrapbooking trips?",
+"Preferred travel companion group size?","Do you collect souvenirs?"
+]],
+["Office + Art", [
+"Do you have/like sketchbooks?","Are you artistic?",
+"Ever wanted a nice art set (e.g. alcohol markers)?","Ever wanted watercolor palette or acrylic tubes?",
+"Do you like physical planners?","Themed office supplies or basic?",
+"Do you have notebooks for personal stuff? Do you like that?","Digital planning (apps) or paper planning?",
+"Favorite pen type (gel, fountain, felt-tip)?","Do you like stickers/washi tape for decorating planners?"
+]],
+["Routine", [
+"Do you like how you wake up (alarm helpful or annoying)?","Early bird or night owl?",
+"First thing you do in the morning","Do you need a clean environment to focus/study?",
+"Reading, listening, or hands-on learner?","Do you save new items for \"the right time\"?",
+"Paper or electronic trackers?","Something you can't live without",
+"Do you meal prep or plan meals ahead?","What's your ideal weekend look like?"
+]],
+["Gifts — Type & Philosophy", [
+"Do you like homemade gifts?","Are you practical? Prefer practical over impractical gifts?",
+"Great experiences vs. something tangible to keep?",
+"A thoughtful gift you don't like, or a gift card somewhere you love?",
+"Surprise gifts or picking out what you want?","If you could splurge on one thing, what would it be?",
+"Would you own something relating to your zodiac?","One thing you have enough of but want more of",
+"Something you use all the time you'd want upgraded","One big gift or several small gifts?",
+"Do you like gifts with inside jokes/personal references, or universally useful ones?",
+"How do you feel about gag/funny gifts as part of a bigger gift?",
+"Do you like matching or \"couple\"/friendship-set items?"
+]],
+["Shopping Behavior", [
+"Replace with latest upgrade or same old version?",
+"Grab first reasonable option, or hunt for the exact item?","Wait for restock or settle for similar?",
+"Read reviews/ask opinions, or just buy?","Do you have a wishlist (Amazon, etc.)?",
+"In clothing stores: stop at \"good enough\" or keep searching?"
+]],
+["Opinions", [
+"What do people waste money on that you don't get?","How would you spend a million dollars?",
+"\"I don't understand why my friends waste money on…\"","Main love language",
+"How would you feel if I gave you roses/flowers?",
+"Do you notice subtle differences in products (flavors, fabrics, screen/speaker settings)?",
+"Secondary love language (if different)","Gifts given privately or opened in front of others?"
+]],
+["Best Gifts", [
+"Who gives you the best gifts?","Best gift you've ever received","Best gift you've ever given",
+"Worst/funniest gift you've ever received (just for fun)","A gift you've always wanted but never gotten"
+]],
+["Food — Favorites", [
+"Favorite restaurant","Favorite fast-food restaurant","Favorite cuisine","Favorite type of food",
+"Favorite flavor (salty, sweet, etc.)","Favorite meal","Favorite pizza toppings","Favorite pizza",
+"Favorite apple pie","Favorite bread","Favorite sandwich","Favorite comfort foods","Favorite candy",
+"Favorite dessert","Favorite pie","Favorite cake","Favorite ice cream flavor","Favorite ice cream brand",
+"Favorite ice cream toppings","Favorite frozen yogurt toppings","Favorite sweet thing",
+"Favorite salty thing","Favorite savory thing","Favorite sour thing","Favorite drinks","Favorite snacks",
+"Favorite soda","Favorite popcorn","Favorite coffee/tea order",
+"Do you drink alcohol? Favorite drink/cocktail if so","Favorite breakfast food","Favorite fruit",
+"Favorite spice/seasoning","Any dietary preferences that affect food gifts"
+]],
+["Food — Do You Like…", [
+"Cheesecake?","Tiramisu?","Sushi?","Charcuterie boards?","Chocolate fudge cake?",
+"Carbonated beverages (non-soda)?","French toast?","Fruit + granola/seeds + nuts?","Pretzels?"
+]],
+["Food — Which?", [
+"Pie or cheesecake?","Pizza or pasta?","Bagels or muffins?","Appetizer or dessert?",
+"Rank pancakes, waffles, french toast"
+]],
+["Dining Preferences", [
+"New reservation at a fancy unknown spot, or a favorite go-to fancy place?",
+"Eat at the table with family, or couch/elsewhere?","Cook or eat out more?",
+"Try new foods, or stick to what you know?","Same question but for snacks",
+"Meals or snack breaks — which do you enjoy more?",
+"Oranges: peel and separate, or cut into quarters with a knife?",
+"Fruit already cut in a bowl, or you cut it yourself?","Cloth or paper napkins?",
+"What would we get if we went out to eat together?","What food can you make from scratch?",
+"Do you like cooking gadgets (air fryer, specific kitchen tools)?",
+"Any kitchen item you keep meaning to buy but haven't?"
+]],
+["Decor — Color & Style", [
+"Favorite color for your room (desk, bed, etc.)","Favorite color to decorate with","Ivory or white?",
+"Favorite seasonal décor","What type of décor would you like more of?",
+"Do you like minimalism in general?","Do you like string lights / fairy lights?",
+"Wall art: photos, posters, paintings, or bare walls?",
+"Do you like scented items beyond candles (diffusers, sachets)?"
+]],
+["Decor — Other", [
+"Lots of pillows on a couch?","Should pillows match or be mixed?",
+"Bed: lots of stuff (blankets, stuffed animals) or minimal?","New/modern or antiques?",
+"Electric or traditional candles?","Favorite candle scent","Personal items: nice design or basic?",
+"What do you think of photo cubes?","Do you like plants?","Grow from seeds or starter plants?",
+"Real plants or would fake plants work fine for you?",
+"Do you like displaying photos of people/memories around your space?"
+]],
+["Clothing — Sizes & Basics", [
+"Shirt size","Pants size","Underwear size","Pants or shorts?","Do you like thrifting?",
+"Jackets or sweaters?","Favorite clothing brands","Shoe size","Bra size (if comfortable to ask)",
+"Hat size (if they wear hats)","Any clothing materials you avoid?"
+]],
+["Aesthetic", [
+"Favorite aesthetic","Dream outfit (casual and formal)","Favorite colors to wear",
+"Colors you think look bad on you","Favorite clothing accessory",
+"How would you describe your personal style?","Favorite designer","How do you feel about logos on shirts?"
+]],
+["Jewelry", [
+"Favorite jewelry item/accessory","Do you like chains?","Ring size",
+"Rank jewelry types (earrings, necklaces, rings, etc.) 1–10","Do you like necklaces?",
+"Fitness watch, smart watch, or traditional watch?","Favorite jewelry color","Gold or silver?",
+"Do you have piercings? Do you like getting jewelry for them?",
+"Dainty/minimal jewelry or bold/statement pieces?"
+]],
+["Fabric & Fit", [
+"Favorite fabric","Do you like athletic clothes?","Favorite pajama pants fabric (fluffy, thick, etc.)",
+"Short or long sleeve?","Favorite patterns","Favorite cut of pants/shirt","Baggy shirts?","Tight shirts?"
+]],
+["Scent (Personal Fragrance)", [
+"Would you be happy getting perfume/cologne as a gift?","Do you like cologne/perfume in general?",
+"Do you like body mists?","Multiple perfumes, or one signature scent?",
+"Pick it yourself, or leave it up to the gifter?","Favorite cologne/perfume","Favorite scent",
+"Favorite scent family (floral, woody, etc.)"
+]],
+["Shoes", [
+"Do you like sandals?","Favorite sandal type","Favorite shoe type","Favorite shoe brand","Favorite slippers"
+]],
+["Socks", [
+"Do you like thick cozy socks?","What sock designs do you like?","Do you like goofy sock designs?"
+]],
+["Personality & Values", [
+"More sentimental or practical?",
+"Do you like being the center of attention or prefer low-key celebrations?",
+"Planner or spontaneous person?","A cause or value that's really important to you?",
+"Handwritten cards or digital messages?",
+"Public declarations (social media posts about you) or private ones?"
+]],
+["Tech & Gadgets", [
+"Phone brand/model","Case color/style preference","Do you need more phone accessories?",
+"Do you like smart home gadgets?","Headphones: over-ear, earbuds, or wired?",
+"Do you need a new laptop bag/backpack?","Any tech gadget you've been eyeing?"
+]],
+["Pets", [
+"If you have pets, what are their names and what do they need/love?",
+"Would you want a gift that's actually for your pet?",
+"Do you like pet-themed merch for yourself?"
+]],
+["Wellness & Fitness", [
+"Do you work out? What kind?","Any fitness gear you want (mat, bottle, resistance bands)?",
+"Do you track sleep/steps/etc. with a device?","Do you like guided meditation apps?"
+]],
+["Sentimental / Memory-Based", [
+"A place that means a lot to you","A song that reminds you of a specific memory",
+"Something from childhood you're nostalgic about","A photo you love that you don't have printed",
+"An inside joke between us you'd want turned into a gift"
+]],
+["Logistics (for the gifter)", [
+"Budget range for this occasion","Wrapping style preference: bag, box, paper, no-frills",
+"Do they open gifts right away or save them for later?",
+"Any upcoming occasion this is for?","Any hints they've already dropped recently?"
+]]
+];
+
+const STORAGE_KEY = "gift-questionnaire-answers";
+let answers = {};
+
+function slug(sectionIdx, itemIdx){ return "s"+sectionIdx+"i"+itemIdx; }
+
+async function loadAnswers(){
+  try{
+    const res = await window.storage.get(STORAGE_KEY, false);
+    if(res && res.value){ answers = JSON.parse(res.value); }
+  }catch(e){ /* no saved data yet */ }
+}
+
+let saveTimer = null;
+function persist(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{ await window.storage.set(STORAGE_KEY, JSON.stringify(answers), false); }
+    catch(e){ console.error("save failed", e); }
+  }, 250);
+}
+
+function totalCount(){
+  return DATA.reduce((sum,[,items])=>sum+items.length,0);
+}
+function answeredCount(){
+  return Object.values(answers).filter(a=>a && (a.done || (a.note && a.note.trim()))).length;
+}
+
+function updateProgress(){
+  const total = totalCount();
+  const done = answeredCount();
+  const pct = total ? Math.round((done/total)*100) : 0;
+  document.getElementById("progressFill").style.width = pct+"%";
+  document.getElementById("progressLabel").textContent = done+" / "+total+" answered";
+}
+
+function sectionAnsweredCount(items, sIdx){
+  let c=0;
+  items.forEach((_,iIdx)=>{
+    const a = answers[slug(sIdx,iIdx)];
+    if(a && (a.done || (a.note && a.note.trim()))) c++;
+  });
+  return c;
+}
+
+function render(){
+  const container = document.getElementById("sections");
+  container.innerHTML = "";
+  DATA.forEach(([title, items], sIdx)=>{
+    const details = document.createElement("details");
+    details.className = "section";
+    details.dataset.section = sIdx;
+
+    const summary = document.createElement("summary");
+    summary.className = "sec-head";
+    summary.innerHTML =
+      '<span class="sec-title"><span class="chev">›</span>'+title+'</span>'+
+      '<span class="sec-count" data-role="sec-count">'+sectionAnsweredCount(items,sIdx)+' / '+items.length+'</span>';
+    details.appendChild(summary);
+
+    const list = document.createElement("div");
+    list.className = "items";
+
+    items.forEach((text, iIdx)=>{
+      const id = slug(sIdx, iIdx);
+      const saved = answers[id] || {done:false, note:""};
+
+      const row = document.createElement("div");
+      row.className = "item" + (saved.done || saved.note.trim() ? " answered" : "");
+      row.dataset.text = text.toLowerCase();
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!saved.done;
+      cb.addEventListener("change", ()=>{
+        answers[id] = answers[id] || {done:false, note:""};
+        answers[id].done = cb.checked;
+        row.classList.toggle("answered", cb.checked || answers[id].note.trim().length>0);
+        persist();
+        updateProgress();
+        refreshSectionCount(sIdx);
+      });
+
+      const body = document.createElement("div");
+      body.className = "item-body";
+
+      const q = document.createElement("p");
+      q.className = "q-text";
+      q.textContent = text;
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.className = "a-input";
+      input.placeholder = "notes / answer…";
+      input.value = saved.note || "";
+      input.addEventListener("input", ()=>{
+        answers[id] = answers[id] || {done:false, note:""};
+        answers[id].note = input.value;
+        row.classList.toggle("answered", cb.checked || input.value.trim().length>0);
+        persist();
+        updateProgress();
+        refreshSectionCount(sIdx);
+      });
+
+      body.appendChild(q);
+      body.appendChild(input);
+      row.appendChild(cb);
+      row.appendChild(body);
+      list.appendChild(row);
+    });
+
+    details.appendChild(list);
+    container.appendChild(details);
+  });
+  updateProgress();
+}
+
+function refreshSectionCount(sIdx){
+  const details = document.querySelector('details.section[data-section="'+sIdx+'"]');
+  if(!details) return;
+  const items = DATA[sIdx][1];
+  const countEl = details.querySelector('[data-role="sec-count"]');
+  if(countEl) countEl.textContent = sectionAnsweredCount(items,sIdx)+' / '+items.length;
+}
+
+function applySearch(term){
+  term = term.trim().toLowerCase();
+  const sections = document.querySelectorAll('details.section');
+  let anyVisible = false;
+  sections.forEach(sec=>{
+    const rows = sec.querySelectorAll('.item');
+    let sectionHasMatch = false;
+    rows.forEach(row=>{
+      const match = !term || row.dataset.text.includes(term);
+      row.classList.toggle('hidden', !match);
+      if(match) sectionHasMatch = true;
+    });
+    sec.classList.toggle('hidden', !sectionHasMatch);
+    if(sectionHasMatch){
+      anyVisible = true;
+      if(term) sec.open = true;
+    }
+  });
+  document.getElementById('emptyState').classList.toggle('hidden', anyVisible || !term);
+}
+
+document.getElementById('search').addEventListener('input', e=>applySearch(e.target.value));
+
+document.getElementById('clearAll').addEventListener('click', async ()=>{
+  if(!confirm("Clear every checkbox and note? This can't be undone.")) return;
+  answers = {};
+  try{ await window.storage.set(STORAGE_KEY, JSON.stringify(answers), false); }catch(e){}
+  render();
+});
+
+(async function init(){
+  await loadAnswers();
+  render();
+})();
+</script>
+</body>
+</html>
